@@ -1,4 +1,6 @@
+"""
 @author: Guido Gazzani & Janka Moeller
+"""
 
 import numpy as np
 import pandas as pd
