@@ -21,13 +21,11 @@ print('Numpy version',np.__version__)
 print('pandas version:',pd.__version__)
 print('Joblib version:',pd.__version__)
 
-
-# In[342]:
     
 user="Janka"
 config="config8"
 
-
+# select the desired loss-function
 loss_flag="LINEAR_VEGA_DELTA" #"LP" # "SOFT_INDICATOR" "LINEAR" "LP_V2"
 
 global power
@@ -39,24 +37,7 @@ load_dir_1= r'/scratch.global/ag_cu/Codes_'+user+'/calibrated_parameters/Maturit
 
 load_dir_2= r'/scratch.global/ag_cu/Codes_'+user+'/calibrated_parameters/Maturity_2_SPX_1_VIX/'+config+'/unscaled_vix/cutt_spx/corrected_version/'+loss_flag+'_lambda='+str(lambda_coeff)
 
-# load_precomputed_vixmat=[r'14.0days', r'49.0days']
-# load_precomputed_dir= [load_dir_1, load_dir_2]
-# load_precomputed_file= ["ell_optimal.npy","ell_optimal_first_joint_si.npy"]
-
-# index_sel_maturities_spx=[6]
-# index_sel_maturities_vix=[2]
-
-
-
-# load_precomputed_vixmat=[r'14.0days']
-# load_precomputed_dir= [load_dir_1]
-# load_precomputed_file= ["ell_optimal.npy"]
-
-
-# index_sel_maturities_spx=[2]
-# index_sel_maturities_vix=[0]
-
-###############################################################
+#the following is needed to locate the previous slices of the rolling proceedure
 
 load_dir_joint1= r'/scratch.global/ag_cu/Codes_'+user+'/calibrated_parameters/ALL_JOINT_same_ell/Mat_SPX[0, 2]_VIX[0]/'+config+'/LINEAR_VEGA_DELTA2_lambda=0.35'
 load_dir_joint2= load_dir_joint1+ r"/ROLLING/Maturity_SPX[6]_VIX[2]/"+config+"/LINEAR_VEGA_DELTA2_lambda=0.35/took_last"
@@ -68,19 +49,9 @@ load_precomputed_vixmat= [r'49.0days', r'105.days', r'140.days']#[r'49.0days', r
 load_precomputed_dir= [load_dir_joint1, load_dir_joint2, load_dir_joint3] #[load_dir_joint1, load_dir_joint2, load_dir_joint3, load_dir_joint4]
 load_precomputed_file= ["ell_optimal_first_joint.npy","ell_optimal_first_joint.npy", "ell_optimal_first_joint.npy"] #["ell_optimal_first_joint.npy","ell_optimal_first_joint.npy","ell_optimal_first_joint.npy","ell_optimal_first_joint.npy"]
 
+#specifie the slice to be calibrated
 index_sel_maturities_spx=[11]
 index_sel_maturities_vix=[5]
-
-# load_dir_joint1= r'/scratch.global/ag_cu/Codes_'+user+'/calibrated_parameters/ALL_JOINT_same_ell/Mat_SPX[0, 2, 4]_VIX[0, 1]/config9/SOFT_INDICATOR_VEGA_DELTA2_lambda=0.35'
-
-
-# load_precomputed_vixmat= [r'77.0days']#[r'49.0days', r'105.days', r'140.days', r'259.0days']
-# load_precomputed_dir= [load_dir_joint1] #[load_dir_joint1, load_dir_joint2, load_dir_joint3, load_dir_joint4]
-# load_precomputed_file= ["ell_optimal_first_joint.npy"] #["ell_optimal_first_joint.npy","ell_optimal_first_joint.npy","ell_optimal_first_joint.npy","ell_optimal_first_joint.npy"]
-
-
-# index_sel_maturities_spx=[8]
-# index_sel_maturities_vix=[3]
 
 #############################################
 
@@ -120,12 +91,10 @@ def find_nearest(array, value):
     return idx
 
 
-# In[343]:
 day=r'/20210602'
 
 
 if config=="config8":
-    #print("I am here", flush=True)
     maturities_vix=[r'14.0days',r'28.0days',r'49.0days',r'77.0days',r'105.0days',r'140.0days',r'259.0days']
     #maturities_spx=[r'16.0days',r'44.0days',r'58.0days',r'79.0days',r'107.0days',r'135.0days',r'170.0days',r'289.0days']
     maturities_spx=[r'14.0days',r'44.0days',r'58.0days',r'79.0days',r'107.0days',r'135.0days',r'170.0days', r'181.0days',r'198.0days',r'212.0days',r'233.0days',r'289.0days']
@@ -137,7 +106,7 @@ if config=="config8":
     moneyness_upperdev_vix=[1.2,1.2,2.3,3,3,3,3.5,3.8]
     moneyness_lowerdev_vix=[0.1,0.1,0.2,0.2,0.2,0.2,0.2]
         
-    #guyon version
+
     moneyness_upperdev_spx=[0.05,0.1,0.2,0.25,0.3,0.35,0.35,0.35,0.35,0.35,0.35,0.5]
     moneyness_lowerdev_spx=[0.08,0.2,0.2,0.25,0.3,0.4,0.4,0.4,0.4,0.4,0.4,0.5]
     nbr_strikes_spx=[80,80,80,100,120,110,50,60,120,110,50,60]
@@ -155,15 +124,6 @@ else:
     moneyness_lowerdev_spx=[0.035,0.3,0.2,0.4,0.3,0.4,0.4,0.4]
     nbr_strikes_spx=[80,80,80,100,120,110,50,60]
 
-# In[344]:
-
-
-
-
-
-# In[345]:
-
-
 os.chdir(r'/scratch.global/ag_cu/Data/VIX/Processed Data'+day) #directory load VIX data locally
 
 list_strikes_vix=[]
@@ -173,6 +133,7 @@ list_bid_vix=[]
 list_ask_vix=[]
 list_spot_vix=[]
 
+#load vix data
 for i,element in enumerate(maturities_vix):
     maturity_vix=element
     df_vix=pd.read_csv('ivol_data_maturity_'+maturity_vix)
@@ -226,7 +187,7 @@ list_prices_spx=[]
 list_of_maturities_spx=[]
 
 
-#nbr_strikes_spx=[80,100,80,110,120,110,50,60]
+#load spx data
 
 for i,element in enumerate(maturities_joint):
     
@@ -299,7 +260,7 @@ T=maturity # put here maturities
 #redundants
 
 
-
+#choose the desired configuration
 if int(config[-1])==1:
     d=3
     order_signature=2
@@ -396,7 +357,7 @@ print('Correlation matrix:\n',np.matrix(Rho).round(4))
 
 # choose configuration ##########################
 
-os.chdir(r'/scratch.global/ag_cu/Codes_Guido/Randomness/n='+str(order_signature)+'/'+config)
+os.chdir(r'/scratch.global/ag_cu/Codes_Janka/Randomness/n='+str(order_signature)+'/'+config)
 
 if config[0]=="r":
     Q_0_all_truncated= np.load("rand_Q_0_all_truncated.npy")
@@ -435,6 +396,9 @@ else:
             
             
     def concatenate_and_torchify(obj):
+        '''
+        Concatenate the Monte Carlo samples of a torch tensor
+        '''
         for j in range(7): # 7 because the rounds of element save are 8; change it accordingly if one changes the nbr of rounds in the sampling procedure
             if j==0:
                 aux=np.concatenate((obj[j],obj[j+1]),axis=1)
@@ -480,6 +444,10 @@ def aux_torch(K,index_sel_maturities,norm,r,q,flag_option_type,mat):
     Input: K (float); strike
           index_sel_maturities, list (of indices corresponding to the desired maturities, e.g. [0] for the first mat)
           norm: VIX_T or S_T; torch.tensors (outputs of VIX_T and get_S_T functions)
+          r: float, interest rate
+          q: float, dividend rate
+          flag_option_type: string, "VIX" or "SPX"
+          mat: maturity 
     Outuput: matrix of payoffs (for one strike and all samples)
     
     '''
@@ -495,47 +463,30 @@ def aux_torch(K,index_sel_maturities,norm,r,q,flag_option_type,mat):
 
 def VIX_T(l,L_torch,annualization):
     '''
+    Compute the VIX in closed form using the scalar product
     Input: l, torch.tensor; parameters
           L_torch, torch.tensor; loaded previously
           annualization; float, scaling factor 
+          
     '''
     scalar_product=torch.matmul(L_torch,l)**2
     
-    #carefull!!! this seems to be worng because this sums over the number of samples
-    #res=torch.sum(scalar_product,1)
-    
-    #we want to sum over the last dimension!
     res=torch.sum(scalar_product,-1)
     
-    
-    #J: below is the scaling without 100
-    #norm=torch.sqrt(annualization*res)/(100) # HERE ILLEGAL SCALING APPLIED (?) 1/\delta
-    
-    #J: below is the scaling with 100
+
     norm=torch.sqrt(annualization*res)
     
-    #J: below is no scaling at all,
-    #norm=torch.sqrt(res)
     
     norm=norm.unsqueeze(0)
     return norm
 
 
-# def monte_carlo_pricing_vix(VIX,strikes_vix,index_sel_maturities): #Cholesky decomposition here is used to speed this up
-#     '''
-#     Pricing function for the VIX, it runs for all strikes the payoff evaluation via aux_torch
-#     '''
-
-#     mc_payoff_arr=[aux_torch(K,index_sel_maturities,VIX) for K in strikes_vix]
-#     return torch.stack(mc_payoff_arr).squeeze(1)
 
 def monte_carlo_pricing_vix(VIX,strikes_vix,index_sel_maturities,r,mat,q=0): #Cholesky decomposition here is used to speed this up
     '''
     Pricing function for the VIX, it runs for all strikes the payoff evaluation via aux_torch
     '''
-    #l=torch.from_numpy(l).float()
-    #q is set to zero as no dividends are in the vix options
-    #q=np.zeros(r.shape)
+    #q is set to zero as no dividends are payed on the VIX
     mc_payoff_arr=[aux_torch(K,index_sel_maturities,VIX,r,0,'VIX',mat) for K in strikes_vix]
     return torch.stack(mc_payoff_arr).squeeze(1)
 
@@ -555,15 +506,6 @@ def optimal_controls(S_T,strike, rate=0, mat=0):
     return optimal_gamma*CV 
 
 
-
-# def controlled_price(optimal_gammas,monte_carlo):
-#     ''' 
-#     Controlled price via MC-CV
-#     '''
-#     diff=monte_carlo-optimal_gammas
-#     diff=torch.mean(diff,1)
-#     return diff.numpy()
-
 def controlled_price(monte_carlo): #optimal_gammas,
     ''' 
     Controlled price via MC-CV
@@ -572,19 +514,16 @@ def controlled_price(monte_carlo): #optimal_gammas,
     diff=torch.mean(diff,1)
     return diff.numpy()
 
-
-
-
 Delta=1/12
 annualization=(100**2)/Delta
 
 
 
 
-# # Pricing of SPX
 
 def get_S_T(ell,Q_0_all_truncated,e_B_sig):
     '''
+    Compute SPX in closed form using scalar products
     Inputs:
     ell: torch_tensor, (d+1)_n dimension
     Q0_all_truncated: torch.tensor, Q_0 matrix without the redundant components
@@ -603,13 +542,7 @@ def get_S_T(ell,Q_0_all_truncated,e_B_sig):
 
 
 
-# def monte_carlo_pricing_spx_nochol(S_T,strikes_spx,index_sel_maturities,r,mat): #Cholesky decomposition here is NOT used 
-#     '''
-#     Pricing function for the SPX, it runs for all strikes the payoff evaluation via aux_torch
-#     '''
 
-#     mc_payoff_arr=[aux_torch(K,index_sel_maturities,S_T,r,mat) for K in strikes_spx]
-#     return torch.stack(mc_payoff_arr).squeeze(1)
 
 def monte_carlo_pricing_spx_nochol(S_T,strikes_spx,index_sel_maturities,r,q,mat): #Cholesky decomposition here is NOT used 
     '''
@@ -647,14 +580,22 @@ def find_ivol(price, spot, strike, T, r, d):
         return -99.99
 
 def Las_Vegas(spot,strike,T,r,d,sigma):
+    '''
+    Compute option Vega
+    '''
     d_1= 1/(sigma*np.sqrt(T))*(np.log(spot/strike) + (r-d+sigma**2/2)*T)
     return np.exp(-d*T)*spot*np.sqrt(T)*phi(d_1)
  
 def Las_Deltas(spot,strike,T,r,d,sigma):
+    '''
+    Compute option Delta
+    '''
     d_1= 1/(sigma*np.sqrt(T))*(np.log(spot/strike) + (r-d+sigma**2/2)*T)
     N_1= norm.cdf(d_1) #scipy.stats.norm.cdf
     return N_1*np.exp(-d*T) 
 
+
+####### Retriev implied volatility surface and greeks first for SPX, then for VIX options
 os.chdir(r'/scratch.global/ag_cu/Data/SPX/Processed Data'+day)
 
 iv_surface_spx=[]
@@ -845,13 +786,11 @@ nbr_options_spx=len(list_prices_spx[index_sel_maturities_spx[0]])
 prices_spx=list_prices_spx[index_sel_maturities_spx[0]]
 
 
-#weights_spx=np.sqrt(las_vegas_spx[index_sel_maturities_spx[0]])
 weights_spx=np.array([1 for _ in range(len(las_vegas_spx[index_sel_maturities_spx[0]]))])
 strikes_spx=list_strikes_spx[index_sel_maturities_spx[0]]
 
 
 prices_vix=list_prices_vix[index_sel_maturities_vix[0]]
-#weights_vix=np.sqrt(las_vegas_vix[index_sel_maturities_vix[0]])
 weights_vix=np.array([1 for _ in range(len(las_vegas_vix[index_sel_maturities_vix[0]]))])
 
 strikes_vix=list_strikes_vix[index_sel_maturities_vix[0]]
@@ -866,7 +805,7 @@ def get_ST_timevarying(l,correction,m,Q_0_all_truncated,e_B_sig,c):
         linear_sig=e_B_sig[idx_to_calib]
         log_ST=-0.5*quadratic_form(l,Q0)+torch.matmul(linear_sig,l)
         
-    else: # so far only implemented for exactly this maturity!
+    else:
         
         Q0_current=(Q_0_all_truncated[m]-Q_0_all_truncated[idx_mat_loaded[-1]]) #(add and do not add to calibration)
         linear_sig_current=(e_B_sig[m]-e_B_sig[idx_mat_loaded[-1]])*c
@@ -879,10 +818,9 @@ def get_ST_timevarying(l,correction,m,Q_0_all_truncated,e_B_sig,c):
 
 
     
-print("before initial samples", flush=True)
+#sample inital ell, if desired
 
 if flag_hyper_both==True:
-    #c=100
     
     nbr_samples_ell=10000
     
@@ -910,15 +848,10 @@ if flag_hyper_both==True:
     
     #for j in tqdm(range(nbr_samples_ell),desc='Sampling initial values SPX'):
     for j in range(nbr_samples_ell):
-        #print("here", j, flush=True)
-        #rng = np.random.default_rng(6394829)
-        #ell=torch.tensor(uniform.rvs(loc=-0.002, scale=0.004, size=Q_0_all_truncated.shape[-1], random_state=rng))
-        #ell=torch.tensor(np.random.uniform(-0.002,0.002,Q_0_all_truncated_only_rel.shape[-1])) #to be tuned
-        #ell=torch.tensor(np.random.uniform(-0.01,0.01,Q_0_all_truncated_only_rel.shape[-1]))
         ell=torch.tensor(np.random.uniform(-0.1,0.1,Q_0_all_truncated_only_rel.shape[-1]))
 
         ell_sampled.append(ell)
-        #print("sampled ell", flush=True)
+
         #SPX
         S_T=get_ST_timevarying(ell,correction,index_sel_maturities_spx[0],Q_0_all_truncated_only_rel,e_B_sig_only_rel,1)    
         S_T=S_T.unsqueeze(0)
@@ -928,41 +861,26 @@ if flag_hyper_both==True:
         idx= index_sel_maturities_spx[0]
         monte_carlo=monte_carlo_pricing_spx_nochol(S_T,strikes_spx,index_sel_maturities_spx,list_rate_spx[idx],list_divi_spx[idx],list_of_maturities_spx[idx])
         spx_model_prices=controlled_price(monte_carlo)
-        #print("calculated SPX", flush=True)
+
 
         VIX=VIX_T(ell,L_torch,annualization)
         VIX=VIX[:,index_sel_maturities_vix[0],:]
         idx=index_sel_maturities_vix[0]
-        #optimal_gammas_vix=torch.stack([optimal_controls(VIX,strike) for strike in strikes_vix]).squeeze(1)
         monte_carlo_vix=monte_carlo_pricing_vix(VIX,strikes_vix,index_sel_maturities_vix,list_rate_vix[idx],list_of_maturities_vix[idx])
         vix_model_prices=controlled_price(monte_carlo_vix)
         
         VIX_future= torch.mean(VIX) #*torch.tensor(np.exp(-1*list_rate_vix[index_sel_maturities_vix[0]]*list_of_maturities_vix[index_sel_maturities_vix[0]]))
-        #print("calculated VIX", flush=True)
-        
-        #print(VIX_future, flush=True)
         
         sampled_prices_spx.append(spx_model_prices)
         sampled_prices_vix.append(vix_model_prices)
-        #print("stored prices", flush=True)
         err_spx=np.sum(np.abs((prices_spx-spx_model_prices)/bid_ask_spread_spx)) ##add scaling of bid_ask
         error_spx.append(err_spx) 
-        #print("stored error spx", flush=True)
         err_vix=np.sum(np.abs((prices_vix-vix_model_prices)/bid_ask_spread_vix))
         error_vix.append(err_vix) 
-        #print("stored error vix", flush=True)
-        
-        # print("0", (list_spot_vix[index_sel_maturities_vix[0]]), flush=True)
-        # print("1",list_spot_vix[index_sel_maturities_vix[0]]-VIX_future.numpy() , flush=True)
-        # print("2", np.abs(list_spot_vix[index_sel_maturities_vix[0]]-VIX_future.numpy()), flush=True)
-        # print("3", (np.abs(list_spot_vix[index_sel_maturities_vix[0]]-VIX_future.numpy()))/(list_spot_vix[index_sel_maturities_vix[0]]), flush=True)
-        
         
         err_future= (np.abs(list_spot_vix[index_sel_maturities_vix[0]]-VIX_future.numpy()))/(list_spot_vix[index_sel_maturities_vix[0]])
-        #print("calculated error future", flush=True)
-        
+
         error_joint.append(err_vix+err_spx+ err_future)
-        #print("stored joint error", flush=True)
         
     sampled_prices_spx=np.array(sampled_prices_spx)
     sampled_prices_vix=np.array(sampled_prices_vix)
@@ -982,7 +900,6 @@ if flag_hyper_both==True:
     print('Minimal error on BOTH for VIX:', error_vix[idx_min])
     
     
-    #c_init= c_sampled[row_idx_min]
     ell_init=ell_sampled[idx_min]
 
     S_T=get_ST_timevarying(ell_init,correction,index_sel_maturities_spx[0],Q_0_all_truncated,e_B_sig,1)    
@@ -1089,8 +1006,6 @@ if flag_hyper_both==True:
 
     
     np.save('ell_init_both.npy',ell_init)
-    #np.save('c_init.npy',c_init)
-    #np.save('ell_init_SPX2.npy',ell_init_spx)
 
 
 elif not take_last_ell:
@@ -1102,15 +1017,14 @@ elif not take_last_ell:
     os.chdir(save_init)
     
     ell_init= np.load('ell_init_both.npy')
-    #c_init= np.load('c_init.npy')
     
     ell_init= torch.tensor(ell_init)
-    #c_init= c_init[0]
     
 if take_last_ell:
     ell_init= l_history[-1]
 
 
+### definition of various loss functions
 def soft_indicator(x):
     return 0.5*(np.tanh(x*100)+1)
 
@@ -1304,7 +1218,6 @@ def loss_spx_BA_v2(l): #now with time-varying function for S_T, m=1 as it is the
 bid_spx= list_bid_spx[index_sel_maturities_spx[0]]
 ask_spx= list_ask_spx[index_sel_maturities_spx[0]]
 
-#aux_weights_spx= [1,1,1,1,1,1,100,100,100,1,1,1]
 
 def funny_loss_spx(l): #now with time-varying function for S_T, m=1 as it is the first joint calibration
     l=torch.tensor(l)
@@ -1368,7 +1281,6 @@ def loss_spx_softindicator_vega(l): #now with time-varying function for S_T, m=1
     diff=np.multiply((prices_spx-controlled_spx)**power,((1/np.abs(bid_ivol_spx[idx]-ask_ivol_spx[idx]))*las_vegas_spx[idx])**power)*(soft_indicator(list_bid_spx[idx]-controlled_spx)+soft_indicator(controlled_spx-list_ask_spx[idx]))
     return np.mean(diff)
 
-#comp_price_scale= np.mean(prices_vix)/np.mean(prices_spx) # here I compensate for the different scale in prices for VIX and SPX
 comp_price_scale=1
 
 
@@ -1415,23 +1327,15 @@ def loss_joint_soft_indicator_vega(l):
 def loss_joint_linear_vega_delta(l):
     
     if lambda_coeff==1:
-        #print("here", flush=True)
         diff1=loss_spx_linear_vega(l)
-        #diff2=loss_vix_linear_vega_delta(l)
-        #res=np.concatenate([np.sqrt(comp_price_scale)*np.sqrt(lambda_coeff)*np.sqrt(1/len(strikes_spx))*diff1,np.sqrt(1-lambda_coeff)*np.sqrt(1/len(strikes_vix))*diff2],axis=0)
-        #res= lambda_coeff*(diff1)+ (1-lambda_coeff)*diff2
         return diff1 
     elif lambda_coeff==0:
-        #diff1=loss_spx_linear_vega(l)
         diff2=loss_vix_linear_vega_delta(l)
-        #res=np.concatenate([np.sqrt(comp_price_scale)*np.sqrt(lambda_coeff)*np.sqrt(1/len(strikes_spx))*diff1,np.sqrt(1-lambda_coeff)*np.sqrt(1/len(strikes_vix))*diff2],axis=0)
-        #res= lambda_coeff*(diff1)+ (1-lambda_coeff)*diff2
         return diff2
         
     else:
         diff1=loss_spx_linear_vega(l)
         diff2=loss_vix_linear_vega_delta(l)
-        #res=np.concatenate([np.sqrt(comp_price_scale)*np.sqrt(lambda_coeff)*np.sqrt(1/len(strikes_spx))*diff1,np.sqrt(1-lambda_coeff)*np.sqrt(1/len(strikes_vix))*diff2],axis=0)
         res= lambda_coeff*(diff1)+ (1-lambda_coeff)*diff2
         return res 
 
@@ -1439,7 +1343,6 @@ def loss_joint_linear_vega_delta(l):
 def loss_joint_softindicator_vega_delta(l):
     diff1=loss_spx_softindicator_vega(l)
     diff2=loss_vix_softindicator_vega_delta(l)
-    #res=np.concatenate([np.sqrt(comp_price_scale)*np.sqrt(lambda_coeff)*np.sqrt(1/len(strikes_spx))*diff1,np.sqrt(1-lambda_coeff)*np.sqrt(1/len(strikes_vix))*diff2],axis=0)
     res= lambda_coeff*(diff1)+ (1-lambda_coeff)*diff2
     return res 
 
@@ -1457,11 +1360,7 @@ def rho_v2(x):
     second_derivative= exp*(exp-1)*(x)**(exp-2)
     return np.array([function, first_derivative, second_derivative])
 
-
-
-
- 
-
+#perform calibration and store results
 if flag_do_first_optim: 
 
     for h in tqdm(range(1),desc='Calibration 1'):
