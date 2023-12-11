@@ -23,8 +23,8 @@ print('Joblib version:',pd.__version__)
 
 # In[342]:
     
-user="Guido"  # it is just a flag for storing in the corresponding directories of Guido or Janka 
-#"Janka"
+user="Janka"  # it is just a flag for storing in the corresponding directories of Guido or Janka 
+
 
 
 loss_flag="LINEAR_VEGA_DELTA"
