@@ -818,6 +818,13 @@ def chol_n_transpose(q):
     return np.linalg.cholesky(q).transpose()
 
 def filter_positive_semidef(Q,idx_mat):
+    '''
+    Inputs: 
+    Q: torch tensor of Q matrix
+    idx_mat: integer corresponding to the maturity
+    Returns:
+    Q: torch tensor where realizations which are not posititve semidefinite are removed.
+    '''
     nbr_params=Q.shape[-1]
     Q=Q[idx_mat,:,:,:].numpy()
     check_eigenvalues=np.sum(np.linalg.eigvalsh(Q)>0,axis=1)
@@ -847,8 +854,11 @@ dict_words_numbers=dict(zip(get_words(d-1,order_signature*2+1),[k for k in range
 
 
 def sample_tilde_df_andQ0_multimaturities(N,maturities,mat_spx,mat_vix,X0,sigmas,kappas,thetas,Rho,order_signature,flag_mat,indices,new_tilde,keys_df,keys_df_vix,Cov,d,idx_Z_d,shuffled_integral_matrix,dict_words_numbers,wordz):
+    """ 
+    Perform sampling across all maturities. 
+    Returns list of transformed signature, Q_0 and Q tensors
+    """    
     
-   
     idx_vix=np.nonzero(mat_vix[:, None] == maturities)[1]
     
     
@@ -894,12 +904,12 @@ def sample_tilde_df_andQ0_multimaturities(N,maturities,mat_spx,mat_vix,X0,sigmas
 
 
 if flag_gatheral==True:
-    os.chdir(r'/scratch.global/ag_cu/Codes_Guido/Randomness_Gatheral2/n='+str(order_signature)+'/'+config)
+    os.chdir(r'/scratch.global/ag_cu/Codes_Janka/Randomness_Gatheral2/n='+str(order_signature)+'/'+config)
 else:
-    os.chdir(r'/scratch.global/ag_cu/Codes_Guido/Randomness/n='+str(order_signature)+'/'+config)
+    os.chdir(r'/scratch.global/ag_cu/Codes_Janka/Randomness/n='+str(order_signature)+'/'+config)
 
 
-
+#Run the actual sampling here
 
 rounds=8
 MC_nbr=10000
